@@ -33,20 +33,20 @@ func bindListenServe() {
 }
 
 func getTweet(w http.ResponseWriter, r *http.Request) {
-	anaconda.SetConsumerKey(CONSUMERKEY)
-	anaconda.SetConsumerSecret(CONSUMERSECRET)
-	api := anaconda.NewTwitterApi(ACCESSTOKEN, ACCESSTOKENSECRET)
+	anaconda.SetConsumerKey("CONSUMERKEY")
+	anaconda.SetConsumerSecret("CONSUMERSECRET")
+	api := anaconda.NewTwitterApi("ACCESSTOKEN", "ACCESSTOKENSECRET")
 
-	searchText := "Boston"
-	searchResult, err := api.GetSearch(searchText, nil)
+	searchResult, err := api.GetSearch("#"+r.URL.Path[7:], nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Fprint(w, "Recent tweets that contain #%s:\n", searchText)
+	fmt.Fprint(w, "Recent tweets that contain #%s:\n", r.URL.Path[7:])
 	for _, tweet := range searchResult.Statuses {
 		if tweet.Text != "" {
+			//fmt.Fprint(w, tweet.User.Name+" @"+tweet.User.ScreenName+"\n")
 			fmt.Fprint(w, tweet.Text)
 		}
 	}
@@ -56,6 +56,6 @@ func main() {
 	http.HandleFunc("/hello", helloWorld)
 	http.HandleFunc("/", hello)
 	//http.HandleFunc("/", echo)
-	//http.HandleFunc("/tweet", getTweet)
+	http.HandleFunc("/tweet/", getTweet)
 	bindListenServe()
 }
